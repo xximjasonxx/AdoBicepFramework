@@ -1,0 +1,27 @@
+parameters:
+  - name: module_name
+    type: string
+  - name: feed_id
+    type: string
+
+steps:
+  - script: echo 'Linting the script'
+  
+  - task: ArchiveFiles@2
+    displayName: Create Zip Archive for ${{parameters.module_name}}
+    inputs:
+      rootFolderOrFile: '${{parameters.module_name}}'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/${{parameters.module_name}}.zip'
+      replaceExistingArchive: true
+
+  - task: UniversalPackages@0
+    displayName: Create Universal Packages for ${{parameters.module_name}}
+    inputs:
+      command: 'publish'
+      publishDirectory: '$(Build.ArtifactStagingDirectory)/${{parameters.module_name}}.zip'
+      feedsToUsePublish: 'internal'
+      vstsFeedPublish: ${{ parameters.feed_id }}
+      vstsFeedPackagePublish: '${{ parameters.module_name }}'
+      versionOption: 'minor'

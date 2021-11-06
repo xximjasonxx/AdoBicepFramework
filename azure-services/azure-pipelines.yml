@@ -1,0 +1,38 @@
+
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest      
+
+steps:
+  - template: './templates/module_download.yaml'
+    parameters:
+      modules:
+        - name: naming-convention
+          version: '*'
+        - name: private-link
+          version: '*'
+      downloadPath: '../bicep-modules'
+      feed_id: ''
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: 'JasonFarrellSubManager'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: 'az deployment sub create --name policy-deployment -f naming-convention-initiative.bicep --location EastUs'
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: 'JasonFarrellSubManager'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: 'az group create --name rg-m2gen2 --location EastUs'
+
+  - task: AzureCLI@2
+    inputs:
+      azureSubscription: 'JasonFarrellSubManager'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: 'az deployment group create --resource-group rg-m2gen2 --template-file sampleapp.bicep'

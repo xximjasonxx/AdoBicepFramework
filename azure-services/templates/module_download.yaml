@@ -1,0 +1,30 @@
+parameters:
+  - name: modules
+    type: object
+    
+  - name: downloadPath
+    type: string
+    default: ""
+
+  - name: feed_id
+    type: string
+
+steps:
+  - ${{ each module in parameters.modules }}:
+    - task: UniversalPackages@0
+      displayName: Download Module ${{ module.name}}
+      inputs:
+        command: 'download'
+        downloadDirectory: '$(Agent.TempDirectory)'
+        feedsToUse: 'internal'
+        vstsFeed: ${{ parameters.feed_id }}
+        vstsFeedPackage: '${{ module.name }}'
+        vstsPackageVersion: '${{ module.version }}'
+
+    - task: ExtractFiles@1
+      displayName: Extract Module ${{ module.name }} Contents
+      inputs:
+        archiveFilePatterns: '$(Agent.TempDirectory)/${{ module.name }}.zip'
+        destinationFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.downloadPath }}/${{ module.name }}'
+        cleanDestinationFolder: true
+        overwriteExistingFiles: true
