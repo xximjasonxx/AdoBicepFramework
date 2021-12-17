@@ -30,8 +30,8 @@ module appGateway '../bicep-modules/appgateway-complete/appgateway-complete.bice
         destinationIp: '10.100.17.4'
         port: 443
         protocol: 'Https'
-        hostName: 'func-m2genroutetest.ase-functionapptest.appserviceenvironment.net'
-        externalHostName: 'm2gen-demo-01.ringen.us'
+        hostName: 'func-routetest.azurwebsites.net'
+        externalHostName: 'myhost.us'
         probeConfig: {
           path: '/'
           codes: [
@@ -41,8 +41,6 @@ module appGateway '../bicep-modules/appgateway-complete/appgateway-complete.bice
         }
         sslConfig: {
           keyVaultSecretId: sslCertUri
-          certificateData: ''
-          certificatePassword: ''
         }
       }
     ]
