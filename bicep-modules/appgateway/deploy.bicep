@@ -59,8 +59,6 @@ var routingRules = [for routeConfig in routeConfigurations: {
 
 var sslCertificates = [for routeConfig in routeConfigurations: {
   name: '${routeConfig.name}-cert'
-  data: empty(routeConfig.sslConfig.certificateData) ? null : routeConfig.sslConfig.certificateData
-  password: empty(routeConfig.sslConfig.certificatePassword) ? null : routeConfig.sslConfig.certificatePassword
   secretId: empty(routeConfig.sslConfig.keyVaultSecretId) ? null : routeConfig.sslConfig.keyVaultSecretId
 }]
 
