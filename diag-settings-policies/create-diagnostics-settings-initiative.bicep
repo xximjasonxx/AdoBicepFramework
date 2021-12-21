@@ -47,7 +47,7 @@ resource diagPolicy 'Microsoft.Authorization/policyDefinitions@2018-05-01' = [fo
                   {
                     type: '${config.type}/providers/diagnosticSettings'
                     apiVersion: '2021-05-01-preview'
-                    name: 'diag-settings'
+                    name: '[parameters(\'resourceName\']/Microsoft.Insights/diag-settings'
                     location: location
                     dependsOn: []
                     properties: {
@@ -71,6 +71,9 @@ resource diagPolicy 'Microsoft.Authorization/policyDefinitions@2018-05-01' = [fo
                 outputs: {}
               }
               parameters: {
+                resourceName: {
+                  value: '[field(\'name\')]'
+                }
               }
             }
           }
