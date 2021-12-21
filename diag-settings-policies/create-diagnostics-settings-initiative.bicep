@@ -1,8 +1,7 @@
 
 targetScope = 'subscription'
 
-@minLength(1)
-param resourceForDiagnostics array
+param resourceForDiagnostics object
 param location string
 param logAnalyticsWorkspaceId string = ''
 param storageAccountId string = ''
@@ -10,27 +9,24 @@ param eventHubId string = ''
 
 var contributorRoleDefId = '/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
-resource diagPolicy 'Microsoft.Authorization/policyDefinitions@2018-05-01' = [for config in resourceForDiagnostics: {
-  name: 'enable-diagnostics-policy-${config.simpleName}'
+resource diagPolicy 'Microsoft.Authorization/policyDefinitions@2018-05-01' = [for config in items(resourceForDiagnostics): {
+  name: 'enable-diagnostics-policy-${config.key}'
   properties: {
-    displayName: 'Enable Diagnostics Policy - ${config.simpleName}'
+    displayName: 'Enable Diagnostics Policy - ${config.key}'
     metadata: {
       category: 'Monitoring'
     }
     mode: 'All'
-    parameters: {
-    }
-
+    parameters: {}
     policyRule: {
       if: {
         field: 'type'
-        equals: config.type
+        equals: config.value.type
       }
       then: {
         effect: 'deployIfNotExists'
         details: {
           type: 'Microsoft.Insights/diagnosticSettings'
-          name: 'setByPolicy'
           roleDefinitionIds: [
             contributorRoleDefId
           ]
@@ -41,30 +37,41 @@ resource diagPolicy 'Microsoft.Authorization/policyDefinitions@2018-05-01' = [fo
                 '$schema': 'http://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#'
                 contentVersion: '1.0.0.0'
                 parameters: {
+                  resourceName: {
+                    type: 'String'
+                  }
+                  resourceId: {
+                    type: 'String'
+                  }
                 }
                 variables: {}
                 resources: [
                   {
-                    type: '${config.type}/providers/diagnosticSettings'
+                    type: '${config.value.type}/providers/diagnosticSettings'
                     apiVersion: '2021-05-01-preview'
-                    name: '[parameters(\'resourceName\']/Microsoft.Insights/diag-settings'
+                    name: '[concat(parameters(\'resourceName\'), \'/Microsoft.Insights/all-diagnositcs\')]'
                     location: location
                     dependsOn: []
                     properties: {
+                      scopes: [
+                        '[parameters(\'resourceId\')]'
+                      ]
                       workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
                       storageAccountId: empty(storageAccountId) ? null : storageAccountId
                       eventHubId: empty(eventHubId) ? null : eventHubId
-                      metrics: [
-                        {
-                          category: 'AllMetrics'
+                      metrics: [for metric in config.value.metrics: {
+                          category: metric
                           timeGrain: null
                           enabled: true
                           retentionPolicy: {
                             enabled: false
                             days: 0
                           }
-                        }
-                      ]
+                      }]
+                      logs: [for log in config.value.logs: {
+                        category: log
+                        enabled: true
+                      }]
                     }
                   }
                 ]
@@ -73,6 +80,9 @@ resource diagPolicy 'Microsoft.Authorization/policyDefinitions@2018-05-01' = [fo
               parameters: {
                 resourceName: {
                   value: '[field(\'name\')]'
+                }
+                resourceId: {
+                  value: '[field(\'id\')]'
                 }
               }
             }
@@ -92,8 +102,8 @@ resource diagnosticsInitiative 'Microsoft.Authorization/policySetDefinitions@202
     }
     parameters: {
     }
-    policyDefinitions: [for (config, i) in resourceForDiagnostics: {
-      policyDefinitionId: diagPolicy[i].id
+    policyDefinitions: [for index in range(0, length(resourceForDiagnostics)): {
+      policyDefinitionId: diagPolicy[index].id
     }]
   }
 

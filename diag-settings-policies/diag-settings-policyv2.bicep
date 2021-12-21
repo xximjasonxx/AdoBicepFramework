@@ -6,40 +6,91 @@ var logAnalyticsWorkspaceId = '/subscriptions/cd35503e-9e28-4b2b-8445-45fc816ba0
 //param storageAccountId string = ''
 //param eventHubId string = ''
 
-var configs = [
-  {
-    simpleName: 'AppService'
+var configs = {
+  appService: {
     type: 'Microsoft.Web/sites'
+    logs: [
+      'AppServiceHTTPLogs'
+      'AppServiceConsoleLogs'
+      'AppServiceAppLogs'
+      'AppServiceAuditLogs'
+      'AppServiceIPSecAuditLogs'
+      'AppServicePlatformLogs'
+    ]
+    metrics: [
+      'AllMetrics'
+    ]
   }
-  {
-    simpleName: 'VirtualNetwork'
+  virtualNetwork: {
     type: 'Microsoft.Network/virtualNetworks'
+    logs: [
+      'VMProtectionAlerts'
+    ]
+    metrics: [
+      'AllMetrics'
+    ]
   }
-  {
-    simpleName: 'AzureFirewall'
+  azureFirewall: {
     type: 'Microsoft.Network/azureFirewalls'
+    logs: [
+      'AzureFirewallApplicationRule'
+      'AzureFirewallNetworkRule'
+      'AzureFirewallDnsProxy'
+    ]
+    metrics: [
+      'AllMetrics'
+    ]
   }
-  {
-    simpleName: 'ApplicationGateway'
+  applicationGateway: {
     type: 'Microsoft.Network/applicationGateways'
+    logs: [
+      'ApplicationGatewayAccessLog'
+      'ApplicationGatewayPerformanceLog'
+      'ApplicationGatewayFirewallLog'
+    ]
+    metrics: [
+      'AllMetrics'
+    ]
   }
-  {
-    simpleName: 'Bastion'
+  bastion: {
     type: 'Microsoft.Network/bastionHosts'
+    logs: [
+      'BastionAuditLogs'
+    ]
+    metrics: [
+      'AllMetrics'
+    ]
   }
-  {
-    simpleName: 'NSG'
+  nsg: {
     type: 'Microsoft.Network/networkSecurityGroups'
+    logs: [
+      'NetworkSecurityGroupEvent'
+      'NetworkSecurityGroupRuleCounter'
+    ]
+    metrics: []
   }
-  {
-    simpleName: 'PIP'
+  pip: {
     type: 'Microsoft.Network/publicIPAddresses'
+    logs: [
+      'DDoSProtectionNotifications'
+      'DDoSMitigationFlowLogs'
+      'DDoSMitigationReports'
+    ]
+    metrics: [
+      'AllMetrics'
+    ]
   }
-  {
-    simpleName: 'KeyVault'
+  keyVault: {
     type: 'Microsoft.KeyVault/vaults'
+    logs: [
+      'AuditEvent'
+      'AzurePolicyEvaluationDetails'
+    ]
+    metrics: [
+      'AllMetrics'
+    ]
   }
-]
+}
 
 module diagnosticInitiative 'create-diagnostics-settings-initiative.bicep' = {
   name: 'create-diagnostics-settings-initiative'
