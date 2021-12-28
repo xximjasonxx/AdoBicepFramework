@@ -9,7 +9,8 @@ param metrics array
 
 param logAnalyticsWorkspaceId string = ''
 param storageAccountId string = ''
-param eventHubId string = ''
+param eventHubAuthRuleId string = ''
+param eventHubName string = ''
 
 // build the values log array
 var logValues = [for logValue in logs: {
@@ -29,43 +30,85 @@ var metricValues = [for metricValue in metrics: {
 }]
 
 // build an array of the actual diagnostic resource types we are going to add (this is only applicable for storage accounts)
-var resourceTypes = resourceType == 'Microsoft.Storage/storageAccounts' ? [
+var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
     {
-      type: resourceType
-      name: '/'
-      logs: []    // we know storage accounts have no logs
-      metrics: metricValues
+      type: '${resourceType}/providers/diagnosticSettings'
+      apiVersion: '2021-05-01-preview'
+      name: '[concat(parameters(\'name\'), \'/Microsoft.Insights/diagnosticSettings\')]'
+      properties: {
+        workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
+        storageAccountId: empty(storageAccountId) ? null : storageAccountId
+        eventHubAuthorizationRuleId: empty(eventHubAuthRuleId) ? null : eventHubAuthRuleId
+        eventHubName: empty(eventHubName) ? null : eventHubName
+        logs: []    // we know storage accounts have no logs
+        metrics: metricValues
+      }
     }
     {
-      type: '${resourceType}/blobServices'
-      name: '/default/'
-      logs: logValues
-      metrics: metricValues
+      type: '${resourceType}/providers/diagnosticSettings/blobServices'
+      apiVersion: '2021-05-01-preview'
+      name: '[concat(parameters(\'name\'), \'/default/Microsoft.Insights/diagnosticSettings\')]'
+      properties: {
+        workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
+        storageAccountId: empty(storageAccountId) ? null : storageAccountId
+        eventHubAuthorizationRuleId: empty(eventHubAuthRuleId) ? null : eventHubAuthRuleId
+        eventHubName: empty(eventHubName) ? null : eventHubName
+        logs: logValues
+        metrics: metricValues
+      }
     }
     {
-      type: '${resourceType}/queueServices'
-      name: '/default/'
-      logs: logValues
-      metrics: metricValues
+      type: '${resourceType}/providers/diagnosticSettings/queueServices'
+      apiVersion: '2021-05-01-preview'
+      name: '[concat(parameters(\'name\'), \'/default/Microsoft.Insights/diagnosticSettings\')]'
+      properties: {
+        workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
+        storageAccountId: empty(storageAccountId) ? null : storageAccountId
+        eventHubAuthorizationRuleId: empty(eventHubAuthRuleId) ? null : eventHubAuthRuleId
+        eventHubName: empty(eventHubName) ? null : eventHubName
+        logs: logValues
+        metrics: metricValues
+      }
     }
     {
-      type: '${resourceType}/tableServices'
-      name: '/default/'
-      logs: logValues
-      metrics: metricValues
+      type: '${resourceType}/providers/diagnosticSettings/tableServices'
+      apiVersion: '2021-05-01-preview'
+      name: '[concat(parameters(\'name\'), \'/default/Microsoft.Insights/diagnosticSettings\')]'
+      properties: {
+        workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
+        storageAccountId: empty(storageAccountId) ? null : storageAccountId
+        eventHubAuthorizationRuleId: empty(eventHubAuthRuleId) ? null : eventHubAuthRuleId
+        eventHubName: empty(eventHubName) ? null : eventHubName
+        logs: logValues
+        metrics: metricValues
+      }
     }
     {
-      type: '${resourceType}/fileServices'
-      name: '/default/'
-      logs: logValues
-      metrics: metricValues
+      type: '${resourceType}/providers/diagnosticSettings/fileServices'
+      apiVersion: '2021-05-01-preview'
+      name: '[concat(parameters(\'name\'), \'/default/Microsoft.Insights/diagnosticSettings\')]'
+      properties: {
+        workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
+        storageAccountId: empty(storageAccountId) ? null : storageAccountId
+        eventHubAuthorizationRuleId: empty(eventHubAuthRuleId) ? null : eventHubAuthRuleId
+        eventHubName: empty(eventHubName) ? null : eventHubName
+        logs: logValues
+        metrics: metricValues
+      }
     }
   ] : [
     {
-      type: resourceType
-      name: '/'
-      logs: logValues
-      metrics: metricValues
+      type: '${resourceType}/providers/diagnosticSettings'
+      apiVersion: '2021-05-01-preview'
+      name: '[concat(parameters(\'name\'), \'/Microsoft.Insights/diagnosticSettings\')]'
+      properties: {
+        workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
+        storageAccountId: empty(storageAccountId) ? null : storageAccountId
+        eventHubAuthorizationRuleId: empty(eventHubAuthRuleId) ? null : eventHubAuthRuleId
+        eventHubName: empty(eventHubName) ? null : eventHubName
+        logs: logValues
+        metrics: metricValues
+      }
     }
   ]
 
@@ -104,17 +147,7 @@ resource policyDef 'Microsoft.Authorization/policyDefinitions@2021-06-01' = {
                     type: 'string'
                   }
                 }
-                resources: [for resource in resourceTypes: {
-                  type: '${resource.type}/providers/diagnosticSettings'
-                  apiVersion: '2021-05-01-preview'
-                  name: '[concat(parameters(\'name\'), \'${resource.name}\', \'Microsoft.Insights/diagnosticSettings\')]'
-                  properties: {
-                    workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
-                    storageAccountId: empty(storageAccountId) ? null : storageAccountId
-                    logs: resource.logs
-                    metrics: resource.metrics
-                  }
-                }]
+                resources: resources
               }
             }
           }
@@ -125,3 +158,6 @@ resource policyDef 'Microsoft.Authorization/policyDefinitions@2021-06-01' = {
     policyType: 'Custom'
   }
 }
+
+// outputs
+output policyDefinitionId string = policyDef.id
