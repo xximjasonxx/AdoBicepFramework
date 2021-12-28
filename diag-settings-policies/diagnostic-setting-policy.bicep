@@ -92,32 +92,25 @@ resource policyDef 'Microsoft.Authorization/policyDefinitions@2021-06-01' = {
             properties: {
               mode: 'Incremental'
               parameters: {
-                resourceName: {
+                name: {
                   value: '[field(\'name\')]'
-                }
-                location: {
-                  value: '[field(\'location\')]'
                 }
               }
               template: {
                 '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
                 contentVersion: '1.0.0.0'
                 parameters: {
-                  resourceName: {
-                    type: 'string'
-                  }
-                  location: {
+                  name: {
                     type: 'string'
                   }
                 }
                 resources: [for resource in resourceTypes: {
                   type: '${resource.type}/providers/diagnosticSettings'
                   apiVersion: '2021-05-01-preview'
-                  location: '[parameters(\'location\')]'
-                  name: '[concat(parameters(\'resourceName\'), \'${resource.name}\', \'Microsoft.Insights/diagnosticSettings\')]'
+                  name: '[concat(parameters(\'name\'), \'${resource.name}\', \'Microsoft.Insights/diagnosticSettings\')]'
                   properties: {
-                    workspaceId: logAnalyticsWorkspaceId
-                    storageAccountId: storageAccountId
+                    workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
+                    storageAccountId: empty(storageAccountId) ? null : storageAccountId
                     logs: resource.logs
                     metrics: resource.metrics
                   }
