@@ -34,7 +34,7 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
     {
       type: '${resourceType}/providers/diagnosticSettings'
       apiVersion: '2021-05-01-preview'
-      name: '[concat(parameters(\'name\'), \'/Microsoft.Insights/diagnosticSettings\')]'
+      name: '[concat(parameters(\'serviceName\'), \'/Microsoft.Insights/diagnosticSettings\')]'
       location: '[parameters(\'location\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
@@ -48,7 +48,7 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
     {
       type: '${resourceType}/providers/diagnosticSettings/blobServices'
       apiVersion: '2021-05-01-preview'
-      name: '[concat(parameters(\'name\'), \'/default/Microsoft.Insights/diagnosticSettings\')]'
+      name: '[concat(parameters(\'serviceName\'), \'/default/\', \'Microsoft.Insights/diagnosticSettings\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -61,7 +61,7 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
     {
       type: '${resourceType}/providers/diagnosticSettings/queueServices'
       apiVersion: '2021-05-01-preview'
-      name: '[concat(parameters(\'name\'), \'/default/Microsoft.Insights/diagnosticSettings\')]'
+      name: '[concat(parameters(\'serviceName\'), \'/default/\', \'Microsoft.Insights/diagnosticSettings\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -74,7 +74,7 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
     {
       type: '${resourceType}/providers/diagnosticSettings/tableServices'
       apiVersion: '2021-05-01-preview'
-      name: '[concat(parameters(\'name\'), \'/default/Microsoft.Insights/diagnosticSettings\')]'
+      name: '[concat(parameters(\'serviceName\'), \'/default/\', \'Microsoft.Insights/diagnosticSettings\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -87,7 +87,7 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
     {
       type: '${resourceType}/providers/diagnosticSettings/fileServices'
       apiVersion: '2021-05-01-preview'
-      name: '[concat(parameters(\'name\'), \'/default/Microsoft.Insights/diagnosticSettings\')]'
+      name: '[concat(parameters(\'serviceName\'), \'/default/\', \'Microsoft.Insights/diagnosticSettings\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -101,7 +101,7 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
     {
       type: '${resourceType}/providers/diagnosticSettings'
       apiVersion: '2021-05-01-preview'
-      name: '[concat(parameters(\'name\'), \'/Microsoft.Insights/diagnosticSettings\')]'
+      name: '[concat(parameters(\'serviceName\'), \'/Microsoft.Insights/diagnosticSettings\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -136,7 +136,7 @@ resource policyDef 'Microsoft.Authorization/policyDefinitions@2021-06-01' = {
             properties: {
               mode: 'Incremental'
               parameters: {
-                name: {
+                serviceName: {
                   value: '[field(\'name\')]'
                 }
                 location: {
@@ -147,7 +147,10 @@ resource policyDef 'Microsoft.Authorization/policyDefinitions@2021-06-01' = {
                 '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
                 contentVersion: '1.0.0.0'
                 parameters: {
-                  name: {
+                  serviceName: {
+                    type: 'string'
+                  }
+                  location: {
                     type: 'string'
                   }
                 }
