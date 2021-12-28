@@ -35,6 +35,7 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
       type: '${resourceType}/providers/diagnosticSettings'
       apiVersion: '2021-05-01-preview'
       name: '[concat(parameters(\'name\'), \'/Microsoft.Insights/diagnosticSettings\')]'
+      location: '[parameters(\'location\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -137,6 +138,9 @@ resource policyDef 'Microsoft.Authorization/policyDefinitions@2021-06-01' = {
               parameters: {
                 name: {
                   value: '[field(\'name\')]'
+                }
+                location: {
+                  value: '[field(\'location\')]'
                 }
               }
               template: {
