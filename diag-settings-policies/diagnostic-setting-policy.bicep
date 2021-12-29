@@ -132,8 +132,25 @@ resource policyDef 'Microsoft.Authorization/policyDefinitions@2021-06-01' = {
         equals: resourceType
       }
       then: {
+        effect: 'DeployIfNotExists'
         details: {
           type: 'Microsoft.Insights/diagnosticSettings'
+          extistenceCondition: {
+            allOf: [
+              {
+                anyof: [
+                  {
+                    equals: true
+                    field: 'Microsoft.Insights/diagnosticSettings/metrics.enabled'
+                  }
+                  {
+                    equals: true
+                    field: 'Microsoft.Insights/diagnosticSettings/logs.enabled'
+                  }
+                ]
+              }
+            ]
+          }
           roleDefinitionIds: [
             contributorRoleDefId
           ]
@@ -164,7 +181,7 @@ resource policyDef 'Microsoft.Authorization/policyDefinitions@2021-06-01' = {
             }
           }
         }
-        effect: 'DeployIfNotExists'
+        
       }
     }
     policyType: 'Custom'
