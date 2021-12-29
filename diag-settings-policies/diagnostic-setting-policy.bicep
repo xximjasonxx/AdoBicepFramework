@@ -46,9 +46,10 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
       }
     }
     {
-      type: '${resourceType}/providers/diagnosticSettings/blobServices'
+      type: '${resourceType}/blobServices/providers/diagnosticSettings'
       apiVersion: '2021-05-01-preview'
       name: '[concat(parameters(\'serviceName\'), \'/default/\', \'Microsoft.Insights/diagnosticSettings\')]'
+      location: '[parameters(\'location\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -59,9 +60,10 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
       }
     }
     {
-      type: '${resourceType}/providers/diagnosticSettings/queueServices'
+      type: '${resourceType}/queueServices/providers/diagnosticSettings'
       apiVersion: '2021-05-01-preview'
       name: '[concat(parameters(\'serviceName\'), \'/default/\', \'Microsoft.Insights/diagnosticSettings\')]'
+      location: '[parameters(\'location\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -72,9 +74,10 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
       }
     }
     {
-      type: '${resourceType}/providers/diagnosticSettings/tableServices'
+      type: '${resourceType}/tableServices/providers/diagnosticSettings'
       apiVersion: '2021-05-01-preview'
       name: '[concat(parameters(\'serviceName\'), \'/default/\', \'Microsoft.Insights/diagnosticSettings\')]'
+      location: '[parameters(\'location\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -85,9 +88,10 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
       }
     }
     {
-      type: '${resourceType}/providers/diagnosticSettings/fileServices'
+      type: '${resourceType}/fileServices/providers/diagnosticSettings'
       apiVersion: '2021-05-01-preview'
       name: '[concat(parameters(\'serviceName\'), \'/default/\', \'Microsoft.Insights/diagnosticSettings\')]'
+      location: '[parameters(\'location\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
@@ -102,6 +106,7 @@ var resources = resourceType == 'Microsoft.Storage/storageAccounts' ? [
       type: '${resourceType}/providers/diagnosticSettings'
       apiVersion: '2021-05-01-preview'
       name: '[concat(parameters(\'serviceName\'), \'/Microsoft.Insights/diagnosticSettings\')]'
+      location: '[parameters(\'location\')]'
       properties: {
         workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
         storageAccountId: empty(storageAccountId) ? null : storageAccountId
