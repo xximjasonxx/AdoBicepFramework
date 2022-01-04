@@ -1,16 +1,16 @@
 
 targetScope = 'subscription'
 
-param configuration object
+param configuration array
 param logAnalyticsWorkspaceId string = ''
 
-module diagPolicy 'diagnostic-setting-policy.bicep' = [for config in items(configuration): {
-  name: '${config.key}Deployment'
+module diagPolicy 'diagnostic-setting-policy.bicep' = [for config in configuration: {
+  name: '${config.name}Deployment'
   params: {
-    resourceName: config.key
-    resourceType: config.value.type
-    logs: config.value.logs
-    metrics: config.value.metrics
+    resourceName: config.name
+    resourceType: config.type
+    logs: config.logs
+    metrics: config.metrics
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
   }
 }]
@@ -24,7 +24,7 @@ resource diagnosticsInitiative 'Microsoft.Authorization/policySetDefinitions@202
     metadata: {
       category: 'Diagnostics'
     }
-    policyDefinitions: [for (config, index) in items(configuration): {
+    policyDefinitions: [for (config, index) in configuration: {
       policyDefinitionId: diagPolicy[index].outputs.policyDefinitionId
     }]
   }
