@@ -1,8 +1,8 @@
 targetScope = 'subscription'
-var contributorRoleDefId = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
 
 @minLength(1)
 param enableDiagnosticsTypes array
+param userIdentityResourceId string
 
 // define a mapping for our values
 var diagnosticSettingsMapping = {
@@ -51,18 +51,6 @@ module initiativeAssignment 'intiative-assignment.bicep' = {
   name: 'initiatveAssignmentDeployment'
   params: {
     intiativeDefinitionId: initiative.outputs.initiativeDefinitionId
+    userIdentityResourceId: userIdentityResourceId
   }
-}
-
-// for the identity created - give it the contributor role
-module initiativeRoleAssignment 'initiative-role-assignment.bicep' = {
-  name: 'initiativeRoleAssignmentDeployment'
-  params: {
-    roleDefinitionId: contributorRoleDefId
-    initiativeIdentityPrincipalId: initiativeAssignment.outputs.initiativeAssignmentPrincipalId
-  }
-
-  dependsOn: [
-    initiativeAssignment
-  ]
 }
