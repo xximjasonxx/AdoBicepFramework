@@ -1,4 +1,4 @@
-targetScope = 'subscription'
+
 param intiativeDefinitionId string
 param userIdentityResourceId string
 
@@ -16,6 +16,3 @@ resource policyAssignment 'Microsoft.Authorization/policyAssignments@2021-06-01'
     }
   }
 }
-
-// outputs
-output initiativeAssignmentPrincipalId string = policyAssignment.identity.principalId
